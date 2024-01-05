@@ -27,7 +27,7 @@ const State = union(enum) {
     }
 };
 
-fn trebuchet_simple(input: []const u8) usize {
+fn trebuchetSimple(input: []const u8) usize {
     var result: usize = 0;
     var state: State = .empty;
 
@@ -47,7 +47,7 @@ const words = [_][]const u8{
     "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 };
 
-fn trebuchet_wordy(input: []const u8) usize {
+fn trebuchetWordy(input: []const u8) usize {
     var result: usize = 0;
     var state: State = .empty;
     var idx: usize = 0;
@@ -77,6 +77,6 @@ fn trebuchet_wordy(input: []const u8) usize {
 pub fn main() void {
     const input = @embedFile("./day1.txt");
 
-    helper.printBenchmark(trebuchet_simple, input);
-    helper.printBenchmark(trebuchet_wordy, input);
+    helper.printBenchmark(trebuchetSimple, input);
+    helper.printBenchmark(trebuchetWordy, input);
 }
