@@ -53,8 +53,63 @@ fn cubeGame(input: []const u8) usize {
     return result;
 }
 
+fn cubePower(input: []const u8) usize {
+    var result: usize = 0;
+    var i: usize = 0;
+
+    var game: struct {
+        red: usize = 0,
+        green: usize = 0,
+        blue: usize = 0,
+    } = .{};
+
+    while (i < input.len) {
+        const ch = input[i];
+
+        if (ch == '\n') {
+            result += game.red * game.green * game.blue;
+            game = .{};
+            i += 1;
+            continue;
+        } else if (ch == ' ' or ch == ';' or ch == ',') {
+            i += 1;
+            continue;
+        } else if (std.mem.startsWith(u8, input[i..], "Game ")) {
+            i += 6; // skip "Game 0"
+            while (std.ascii.isDigit(input[i])) : (i += 1) {}
+            i += 2; // skip ": "
+            continue;
+        }
+
+        var end: usize = i;
+        while (std.ascii.isDigit(input[end])) : (end += 1) {}
+
+        const num = std.fmt.parseInt(u8, input[i..end], 10) catch unreachable;
+
+        i = end + 1;
+        for (colors) |color| {
+            if (std.mem.startsWith(u8, input[i..], color)) {
+                const name = std.meta.stringToEnum(ColorName, color).?;
+
+                if (name == .red and game.red < num) {
+                    game.red = num;
+                } else if (name == .green and game.green < num) {
+                    game.green = num;
+                } else if (name == .blue and game.blue < num) {
+                    game.blue = num;
+                }
+
+                i += color.len;
+            }
+        }
+    }
+
+    return result;
+}
+
 pub fn main() !void {
     const input = @embedFile("./day2.txt");
 
     helper.printBenchmark(cubeGame, input);
+    helper.printBenchmark(cubePower, input);
 }
