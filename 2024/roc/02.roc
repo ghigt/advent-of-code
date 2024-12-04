@@ -32,51 +32,31 @@ parseInput = \input ->
 check = \ns, dir ->
     when ns is
         [a, b, .. as rest] ->
-            when dir is
-                Asc ->
-                    if b - a >= 1 && b - a <= 3 then
-                        check (List.prepend rest b) Asc
-                    else
-                        Bool.false
-
-                Desc ->
-                    if a - b >= 1 && a - b <= 3 then
-                        check (List.prepend rest b) Desc
-                    else
-                        Bool.false
-
-                None ->
-                    if a - b >= 1 && a - b <= 3 then
-                        check (List.prepend rest b) Desc
-                    else if b - a >= 1 && b - a <= 3 then
-                        check (List.prepend rest b) Asc
-                    else
-                        Bool.false
+            if b - a >= 1 && b - a <= 3 && (dir == Asc || dir == None) then
+                check (List.prepend rest b) Asc
+            else if a - b >= 1 && a - b <= 3 && (dir == Desc || dir == None) then
+                check (List.prepend rest b) Desc
+            else
+                Bool.false
 
         [_] | [] -> Bool.true
 
 part1 : Str -> Result Str Str
 part1 = \input ->
     parseInput input
-    |> List.map \ns -> check ns None
-    |> List.keepIf \x -> x
-    |> List.len
+    |> List.countIf \ns -> check ns None
     |> Num.toStr
     |> Ok
 
 part2 : Str -> Result Str Str
 part2 = \input ->
     parseInput input
-    |> List.map \ns ->
-        res = check ns None
-        if !res then
-            List.range { start: At 0, end: At ((List.len ns) - 1) }
-            |> List.any \x ->
-                check (List.dropAt ns x) None
+    |> List.countIf \ns ->
+        if !(check ns None) then
+            List.range { start: At 0, end: Length (List.len ns) }
+            |> List.any \x -> check (List.dropAt ns x) None
         else
             Bool.true
-    |> List.keepIf \x -> x
-    |> List.len
     |> Num.toStr
     |> Ok
 
